@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -77,6 +78,36 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		s.ChannelMessagesBulkDelete(m.ChannelID, msgSlice)
+	}
+
+	if sp[0] == "!mute" || sp[0] == "!unmute" {
+		guildID := os.Getenv("GUILD_ID")
+		guildMembers, _ := s.GuildMembers(guildID, "", 10)
+
+		if len(sp) == 1 {
+			return
+		}
+
+		for _, member := range guildMembers {
+			if member.User.Username == sp[1] {
+				s.GuildMemberMute(guildID, member.User.ID, !member.Mute)
+
+				if len(sp) == 3 {
+					i, _ := strconv.Atoi(sp[2])
+					ts := time.Duration(i)
+					t := time.NewTimer(ts * time.Second)
+					defer t.Stop()
+
+					go func() {
+						<-t.C
+						s.GuildMemberMute(guildID, member.User.ID, !member.Mute)
+					}()
+				}
+
+				return
+			}
+		}
+
 	}
 
 }
