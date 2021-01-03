@@ -59,6 +59,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, "Ping!")
 	}
 
+	if m.Content == "!serverinfo" {
+		guildID := os.Getenv("GUILD_ID")
+		guild, _ := s.Guild(guildID)
+
+		r := "Server Info:\n" +
+			"Name: " + guild.Name + "\n" +
+			"ID: " + guild.ID + "\n" +
+			"Region: " + guild.Region + "\n" +
+			"Description: " + guild.Description + "\n" +
+			"Locale: " + guild.PreferredLocale + "\n"
+
+		s.ChannelMessageSend(m.ChannelID, r)
+	}
+
 	sp := strings.Split(m.Content, " ")
 
 	if sp[0] == "!delete" {
