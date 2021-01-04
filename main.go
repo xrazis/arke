@@ -73,6 +73,18 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, r)
 	}
 
+	if m.Content == "!botinfo" {
+		hostname, _ := os.Hostname()
+
+		r := "Bot Info:\n" +
+			"Name: " + s.State.User.Username + "\n" +
+			"ID: " + s.State.User.ID + "\n" +
+			"Discriminator: " + s.State.User.Discriminator + "\n" +
+			"Host: " + hostname + "\n"
+
+		s.ChannelMessageSend(m.ChannelID, r)
+	}
+
 	sp := strings.Split(m.Content, " ")
 
 	if sp[0] == "!delete" {
@@ -121,7 +133,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				return
 			}
 		}
-
 	}
 
 }
