@@ -1,18 +1,31 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
+	"unicode/utf8"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
 )
+
+type urls struct {
+	Small string
+}
+
+type unsplashAPI struct {
+	Id              string
+	Alt_description string
+	Urls            urls
+}
 
 func main() {
 	err := godotenv.Load()
@@ -38,7 +51,7 @@ func main() {
 		return
 	}
 
-	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
+	fmt.Println("Arke is now running!")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
@@ -81,6 +94,23 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			"Discriminator: " + s.State.User.Discriminator + "\n" +
 			"ID: " + s.State.User.ID + "\n" +
 			"Host: " + hostname + "\n"
+
+		s.ChannelMessageSend(m.ChannelID, r)
+	}
+
+	if m.Content == "!dog" || m.Content == "!cat" {
+		t := trimFirstRune(m.Content)
+		a := unsplashAPI{}
+
+		url := "https://api.unsplash.com/photos/random/?query=" + t + "&client_id=S7DgKIlRASArvLuHj2hQ1tLQiisA1wzEYUEvg12FZsA"
+		res, _ := http.Get(url)
+		defer res.Body.Close()
+
+		json.NewDecoder(res.Body).Decode(&a)
+
+		r := a.Alt_description +
+			"\n" +
+			a.Urls.Small
 
 		s.ChannelMessageSend(m.ChannelID, r)
 	}
@@ -130,7 +160,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				s.ChannelMessageSend(m.ChannelID, r)
 			}
 		}
-
 	}
 
 	if sp[0] == "!mute" || sp[0] == "!unmute" {
@@ -162,4 +191,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
+}
+
+func trimFirstRune(s string) string {
+	_, i := utf8.DecodeRuneInString(s)
+	return s[i:]
 }
