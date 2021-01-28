@@ -100,9 +100,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Content == "!dog" || m.Content == "!cat" {
 		t := trimFirstRune(m.Content)
+		unsplashAPIKey := os.Getenv("UNSPLASH_API_KEY")
 		a := unsplashAPI{}
 
-		url := "https://api.unsplash.com/photos/random/?query=" + t + "&client_id=S7DgKIlRASArvLuHj2hQ1tLQiisA1wzEYUEvg12FZsA"
+		url := "https://api.unsplash.com/photos/random/?query=" + t + "&client_id=" + unsplashAPIKey
 		res, _ := http.Get(url)
 		defer res.Body.Close()
 
