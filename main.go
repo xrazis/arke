@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -17,15 +15,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type urls struct {
-	Small string
-}
-
-type unsplashAPI struct {
-	Id              string
-	Alt_description string
-	Urls            urls
-}
+import . "arke/api/requests"
+import . "arke/api/types"
 
 func main() {
 	err := godotenv.Load()
@@ -34,7 +25,6 @@ func main() {
 	}
 
 	token := os.Getenv("DISCORD_TOKEN")
-
 	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
@@ -42,7 +32,6 @@ func main() {
 	}
 
 	dg.AddHandler(messageCreate)
-
 	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
 
 	err = dg.Open()
@@ -99,19 +88,17 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if m.Content == "!dog" || m.Content == "!cat" {
+		at := UnsplashApi{}
 		t := trimFirstRune(m.Content)
 		unsplashAPIKey := os.Getenv("UNSPLASH_API_KEY")
-		a := unsplashAPI{}
 
 		url := "https://api.unsplash.com/photos/random/?query=" + t + "&client_id=" + unsplashAPIKey
-		res, _ := http.Get(url)
-		defer res.Body.Close()
 
-		json.NewDecoder(res.Body).Decode(&a)
+		ReadRespBody(url, &at)
 
-		r := a.Alt_description +
+		r := at.Alt_description +
 			"\n" +
-			a.Urls.Small
+			at.Urls.Small
 
 		s.ChannelMessageSend(m.ChannelID, r)
 	}
