@@ -33,4 +33,4 @@ Mutes, unmutes or temporarily mutes user s, where s is a string and i is an inte
 
 ### `!dog || !cat`
 
-Returns a lovely dog or cat image from the web.
+Returns a lovely dog or cat image from Unsplash.
