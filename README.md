@@ -1,6 +1,6 @@
-# Arke
+# Marvin
 
-*Arke is a no frills, discord bot with some basic functionality.*
+*Marvin is a no frills, discord bot with some basic functionality.*
 
 ## Commands
 
