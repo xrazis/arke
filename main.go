@@ -15,8 +15,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-import . "arke/api/requests"
-import . "arke/api/types"
+import . "marvin/api/requests"
+import . "marvin/api/types"
 
 func main() {
 	err := godotenv.Load()
@@ -40,7 +40,7 @@ func main() {
 		return
 	}
 
-	fmt.Println("Arke is now running!")
+	fmt.Println("Marvin is up and running!")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
