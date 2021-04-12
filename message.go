@@ -28,27 +28,22 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		guildID := os.Getenv("GUILD_ID")
 		guild, _ := s.Guild(guildID)
 
-		r := "Server Info\n" +
-			"Name: " + guild.Name + "\n" +
-			"ID: " + guild.ID + "\n" +
-			"Region: " + guild.Region + "\n" +
-			"Description: " + guild.Description + "\n" +
-			"Locale: " + guild.PreferredLocale + "\n"
-
-		_, _ = s.ChannelMessageSend(m.ChannelID, r)
-
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Server Info\n"+
+			"Name: "+guild.Name+"\n"+
+			"ID: "+guild.ID+"\n"+
+			"Region: "+guild.Region+"\n"+
+			"Description: "+guild.Description+"\n"+
+			"Locale: "+guild.PreferredLocale+"\n")
 	}
 
 	if m.Content == "!botinfo" {
 		hostname, _ := os.Hostname()
 
-		r := "Bot Info\n" +
-			"Name: " + s.State.User.Username + "\n" +
-			"Discriminator: " + s.State.User.Discriminator + "\n" +
-			"ID: " + s.State.User.ID + "\n" +
-			"Host: " + hostname + "\n"
-
-		_, _ = s.ChannelMessageSend(m.ChannelID, r)
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Bot Info\n"+
+			"Name: "+s.State.User.Username+"\n"+
+			"Discriminator: "+s.State.User.Discriminator+"\n"+
+			"ID: "+s.State.User.ID+"\n"+
+			"Host: "+hostname+"\n")
 	}
 
 	if m.Content == "!dog" || m.Content == "!cat" {
@@ -60,11 +55,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		ReadRespBody(url, &at)
 
-		r := at.Alt_description +
-			"\n" +
-			at.Urls.Small
+		_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+			Description: at.Alt_description,
 
-		_, _ = s.ChannelMessageSend(m.ChannelID, r)
+			Color: 0x000000,
+
+			Image: &discordgo.MessageEmbedImage{
+				URL: at.Urls.Small,
+			},
+		})
+
 	}
 
 	sp := strings.Split(m.Content, " ")
@@ -101,15 +101,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				t, _ := member.JoinedAt.Parse()
 				j := t.Local().Format(time.ANSIC)
 
-				r := "User Info\n" +
-					"Name: " + member.User.Username + "\n" +
-					"Discriminator: " + member.User.Discriminator + "\n" +
-					"ID: " + member.User.ID + "\n" +
-					"Joined server: " + j + "\n" +
-					"MFA status: " + strconv.FormatBool(member.User.MFAEnabled) + "\n" +
-					"Verified status: " + strconv.FormatBool(member.User.Verified) + "\n"
-
-				_, _ = s.ChannelMessageSend(m.ChannelID, r)
+				_, _ = s.ChannelMessageSend(m.ChannelID, "User Info\n"+
+					"Name: "+member.User.Username+"\n"+
+					"Discriminator: "+member.User.Discriminator+"\n"+
+					"ID: "+member.User.ID+"\n"+
+					"Joined server: "+j+"\n"+
+					"MFA status: "+strconv.FormatBool(member.User.MFAEnabled)+"\n"+
+					"Verified status: "+strconv.FormatBool(member.User.Verified)+"\n")
 			}
 		}
 	}
